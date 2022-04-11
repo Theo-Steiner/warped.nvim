@@ -69,7 +69,7 @@ end
 
 local fwatch = require("fwatch")
 local listen_for_theme_change = function()
-	local path = "/Users/theosteiner/Library/Preferences/dev.warp.Warp-Stable.plist"
+	local path = vim.fn.expand("~") .. "/Library/Preferences/dev.warp.Warp-Stable.plist"
 	fwatch.watch(path, {
 		on_event = function()
 			vim.defer_fn(set_warp_based_theme, 100)
