@@ -1,3 +1,4 @@
+-- TODO: de-hardcode the themes
 return {
 	Dracula = {
 		bright_blue = "#caa9fa",
