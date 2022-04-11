@@ -2,7 +2,9 @@
 
 > ⚠️ THIS IS STILL VERY MUCH A WORK IN PROGRESS.
 > While I work on automatic theme generation, for now only the Dracula theme is available.
-A plugin to keep your neovim in sync with Warp's themes.
+
+
+**warped.nvim** - keep your neovim in sync with Warp (the awesome terminal).
 
 ## Installation
 
