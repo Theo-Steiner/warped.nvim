@@ -1,86 +1,61 @@
 local Warped = {}
-
 local colorbuddy = require("colorbuddy")
-colorbuddy.setup()
+local default_mapping = {
+	-- text color
+	white = "bright_white",
+	-- responsible for errors, lua table keys, gitsigns delete
+	red = "dark_red",
+	-- Responsible for: git signs added, lua strings
+	green = "bright_green",
+	-- Responisble for <Component> / <html-tag> inner color gitsigns modified, lualine normal mode
+	yellow = "dark_blue",
+	-- selected color, link inside of a tag, "local" declaration
+	blue = "dark_cyan",
+	-- neo-tree folder color
+	orange = "dark_yellow",
+	aqua = "bright_blue",
+	cyan = "dark_green",
+	purple = "dark_magenta",
+	violet = "bright_cyan",
+	brown = "dark_white",
+	seagree = "bright_red",
+	turquoise = "bright_magenta",
+	-- seems unimportant
+	pink = "bright_yellow",
+}
 
-local Color = colorbuddy.Color
 -- map vim colors to 16 terminal colors
 local themes = require("warped.themes")
-local set_theme_colors = function(current_theme)
-	local current_colors = themes[current_theme]
+local adapt_colorscheme = function(theme_name, mapping)
+	local Color = colorbuddy.Color
+	local current_colors = themes[theme_name]
 	if current_colors then
-		-- white -> bright:white
-		Color.new("white", current_colors.bright_white)
-
-		-- red -> dark:red
-		Color.new("red", current_colors.dark_red)
-
-		-- pink -> bright:yellow
-		Color.new("pink", current_colors.bright_yellow)
-
-		-- Responsible for: git signs added
-		-- green -> bright:green
-		Color.new("green", current_colors.bright_green)
-
-		-- Responisble for <Component> / <html-tag> color
-		-- yellow -> dark:blue
-		Color.new("yellow", current_colors.dark_blue)
-
-		-- v-selection link inside of a tag
-		-- blue -> dark:cyan
-		Color.new("blue", current_colors.dark_cyan)
-
-		-- aqua -> bright:blue
-		Color.new("aqua", current_colors.bright_blue)
-
-		-- cyan -> dark:green
-		Color.new("cyan", current_colors.dark_green)
-
-		-- purple -> dark:magenta
-		Color.new("purple", current_colors.dark_magenta)
-
-		-- violet -> bright:cyan
-		Color.new("violet", current_colors.bright_cyan)
-
-		-- orange -> dark:yellow
-		Color.new("orange", current_colors.dark_yellow)
-
-		-- brown -> dark:white
-		Color.new("brown", current_colors.dark_white)
-
-		-- seagreen -> bright:red
-		Color.new("seagreen", current_colors.bright_red)
-
-		-- turquoise -> bright:magenta
-		Color.new("turquoise", current_colors.bright_magenta)
+		for vim_color, assigned_color in pairs(mapping) do
+			local derived_color = current_colors[assigned_color]
+			Color.new(vim_color, derived_color or assigned_color)
+		end
 	end
 	-- apply changes to the colorscheme
-	colorbuddy.colorscheme("warped")
+	Warped.apply()
 end
 
-local set_warp_based_theme = function()
-	-- get theme name from defaults api
-	local handle = io.popen("defaults read dev.warp.Warp-Stable Theme")
-	-- remove trailing newline and any special characters from theme name
-	local theme_name = handle:read("*a"):sub(1, -2):gsub("[%p%c%s]", "")
-	handle:close()
-	set_theme_colors(theme_name)
-end
-
-local fwatch = require("fwatch")
-local listen_for_theme_change = function()
-	local path = vim.fn.expand("~/Library/Preferences/dev.warp.Warp-Stable.plist")
-	fwatch.watch(path, {
-		on_event = function()
-			vim.defer_fn(set_warp_based_theme, 100)
-		end,
-	})
-end
-
-function Warped.setup()
+function Warped.setup(settings)
+	-- set defaults for settings if undefined
+	settings = settings or {}
+	settings.onchange_callback = settings.onchange_callback or adapt_colorscheme
+	settings.color_mapping = settings.color_mapping or default_mapping
+	-- setup colorbuddy
+	colorbuddy.setup()
+	local utils = require("warped.utils")
 	-- call once to initialize without any colors
-	set_warp_based_theme()
-	listen_for_theme_change()
+	local initial_theme_name = utils.extract_theme()
+	settings.onchange_callback(initial_theme_name, settings.color_mapping)
+	-- set up listener for subsequent theme adaptation
+	utils.listen(settings)
+end
+
+function Warped.apply()
+	colorbuddy.colorscheme("warped")
 end
 
 return Warped
