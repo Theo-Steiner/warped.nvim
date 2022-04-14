@@ -9,6 +9,16 @@ function M.extract_theme()
 	return theme_name
 end
 
+-- pcall wrapper around require
+function M.try_require(module_path)
+	local success, lib = pcall(require, module_path)
+	if success then
+		return lib
+	end
+	--module failed to load
+	return nil
+end
+
 function M.listen(settings)
 	local fwatch = require("fwatch")
 	local path = vim.fn.expand("~/Library/Preferences/dev.warp.Warp-Stable.plist")

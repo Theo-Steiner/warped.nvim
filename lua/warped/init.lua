@@ -1,5 +1,7 @@
 local Warped = {}
 local colorbuddy = require("colorbuddy")
+local utils = require("warped.utils")
+
 local default_mapping = {
 	-- text color
 	white = "bright_white",
@@ -25,10 +27,10 @@ local default_mapping = {
 }
 
 -- map vim colors to 16 terminal colors
-local themes = require("warped.themes")
 local adapt_colorscheme = function(theme_name, mapping)
 	local Color = colorbuddy.Color
-	local current_colors = themes[theme_name]
+	local module_name = "warped.themes." .. theme_name:lower()
+	local current_colors = utils.try_require(module_name)
 	if current_colors then
 		for vim_color, assigned_color in pairs(mapping) do
 			local derived_color = current_colors[assigned_color]
@@ -46,7 +48,6 @@ function Warped.setup(settings)
 	settings.color_mapping = settings.color_mapping or default_mapping
 	-- setup colorbuddy
 	colorbuddy.setup()
-	local utils = require("warped.utils")
 	-- call once to initialize without any colors
 	local initial_theme_name = utils.extract_theme()
 	settings.onchange_callback(initial_theme_name, settings.color_mapping)
