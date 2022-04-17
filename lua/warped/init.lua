@@ -1,10 +1,13 @@
 local Warped = {}
-local colorbuddy = require("colorbuddy")
 local utils = require("warped.utils")
+local colorbuddy = utils.try_require("colorbuddy")
 
 local default_mapping = {
+	background = "background",
+	foreground = "foreground",
 	-- text color
-	white = "bright_white",
+	white = "normal_white",
+	black = "normal_black",
 	-- responsible for errors, lua table keys, gitsigns delete
 	red = "normal_red",
 	-- Responsible for: git signs added, lua strings
@@ -27,22 +30,18 @@ local default_mapping = {
 }
 
 -- map vim colors to 16 terminal colors
-local adapt_colorscheme = function(theme_name, mapping)
+local adapt_colorscheme = function(theme_colors, _theme_name, mapping)
 	local Color = colorbuddy.Color
-	-- see if is standard theme first (TODO: remove once standard themes are in github)
-	local standard_module_name = "warped.standard_themes." .. theme_name:lower()
-	local theme_colors = utils.try_require(standard_module_name)
-	-- else check if is non-standard theme
-	local module_name = "warped.themes." .. theme_name:lower()
-	theme_colors = theme_colors or utils.try_require(module_name)
 	if theme_colors then
 		for vim_color, assigned_color in pairs(mapping) do
 			local derived_color = theme_colors[assigned_color]
 			Color.new(vim_color, derived_color or assigned_color)
 		end
+		Warped.apply(theme_colors["bg"] == "light")
+	else
+		-- re-apply colorscheme nonetheless
+		Warped.apply()
 	end
-	-- apply changes to the colorscheme
-	Warped.apply()
 end
 
 function Warped.setup(settings)
@@ -50,17 +49,23 @@ function Warped.setup(settings)
 	settings = settings or {}
 	settings.onchange_callback = settings.onchange_callback or adapt_colorscheme
 	settings.color_mapping = settings.color_mapping or default_mapping
+
 	-- setup colorbuddy
-	colorbuddy.setup()
+	if colorbuddy then
+		colorbuddy.setup()
+	end
+
 	-- call once to initialize without any colors
 	local initial_theme_name = utils.extract_theme()
-	settings.onchange_callback(initial_theme_name, settings.color_mapping)
+	local theme_colors = utils.load_theme_colors(initial_theme_name)
+	settings.onchange_callback(theme_colors, initial_theme_name, settings.color_mapping)
+
 	-- set up listener for subsequent theme adaptation
 	utils.listen(settings)
 end
 
-function Warped.apply()
-	colorbuddy.colorscheme("warped")
+function Warped.apply(light)
+	colorbuddy.colorscheme("warped", light)
 end
 
 return Warped
