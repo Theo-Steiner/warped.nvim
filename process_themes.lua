@@ -26,6 +26,12 @@ local parse_file = function(file_path)
 					if colorname then
 						if str:find("#") then
 							colorvalue = str:gsub("%s+", "")
+						elseif str:find("darker") then
+							colorname = "bg"
+							colorvalue = "'dark'"
+						elseif str:find("lighter") then
+							colorname = "bg"
+							colorvalue = "'light'"
 						end
 					else
 						colorname = str:gsub("%s+", "")
