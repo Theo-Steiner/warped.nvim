@@ -30,14 +30,14 @@ local default_mapping = {
 local adapt_colorscheme = function(theme_name, mapping)
 	local Color = colorbuddy.Color
 	-- see if is standard theme first (TODO: remove once standard themes are in github)
-	local standard_module_name = "warped.default_themes." .. theme_name:lower()
-	local current_colors = utils.try_require(standard_module_name)
+	local standard_module_name = "warped.standard_themes." .. theme_name:lower()
+	local theme_colors = utils.try_require(standard_module_name)
 	-- else check if is non-standard theme
 	local module_name = "warped.themes." .. theme_name:lower()
-	current_colors = current_colors or utils.try_require(module_name)
-	if current_colors then
+	theme_colors = theme_colors or utils.try_require(module_name)
+	if theme_colors then
 		for vim_color, assigned_color in pairs(mapping) do
-			local derived_color = current_colors[assigned_color]
+			local derived_color = theme_colors[assigned_color]
 			Color.new(vim_color, derived_color or assigned_color)
 		end
 	end
