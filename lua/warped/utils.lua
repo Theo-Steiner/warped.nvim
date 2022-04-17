@@ -26,7 +26,7 @@ function M.listen(settings)
 		on_event = function()
 			local theme_name = M.extract_theme()
 			vim.defer_fn(function()
-				settings.onchange_callback(theme_name, settings.mapping)
+				settings.onchange_callback(theme_name, settings.color_mapping)
 			end, 100)
 		end,
 	})
