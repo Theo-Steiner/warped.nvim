@@ -6,20 +6,20 @@ local default_mapping = {
 	-- text color
 	white = "bright_white",
 	-- responsible for errors, lua table keys, gitsigns delete
-	red = "dark_red",
+	red = "normal_red",
 	-- Responsible for: git signs added, lua strings
 	green = "bright_green",
 	-- Responisble for <Component> / <html-tag> inner color gitsigns modified, lualine normal mode
-	yellow = "dark_blue",
+	yellow = "normal_blue",
 	-- selected color, link inside of a tag, "local" declaration
-	blue = "dark_cyan",
+	blue = "normal_cyan",
 	-- neo-tree folder color
-	orange = "dark_yellow",
+	orange = "normal_yellow",
 	aqua = "bright_blue",
-	cyan = "dark_green",
-	purple = "dark_magenta",
+	cyan = "normal_green",
+	purple = "normal_magenta",
 	violet = "bright_cyan",
-	brown = "dark_white",
+	brown = "normal_white",
 	seagree = "bright_red",
 	turquoise = "bright_magenta",
 	-- seems unimportant
@@ -29,8 +29,12 @@ local default_mapping = {
 -- map vim colors to 16 terminal colors
 local adapt_colorscheme = function(theme_name, mapping)
 	local Color = colorbuddy.Color
+	-- see if is standard theme first (TODO: remove once standard themes are in github)
+	local standard_module_name = "warped.default_themes." .. theme_name:lower()
+	local current_colors = utils.try_require(standard_module_name)
+	-- else check if is non-standard theme
 	local module_name = "warped.themes." .. theme_name:lower()
-	local current_colors = utils.try_require(module_name)
+	current_colors = current_colors or utils.try_require(module_name)
 	if current_colors then
 		for vim_color, assigned_color in pairs(mapping) do
 			local derived_color = current_colors[assigned_color]
