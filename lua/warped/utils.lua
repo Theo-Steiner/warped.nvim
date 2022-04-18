@@ -4,9 +4,12 @@ function M.extract_theme()
 	-- get theme name from defaults api
 	local handle = io.popen("defaults read dev.warp.Warp-Stable Theme")
 	-- remove trailing newline and any special characters from theme name
-	local theme_name = handle:read("*a"):sub(1, -2):gsub("[%p%c%s]", "")
+	local theme_name = handle:read("*a"):sub(1, -2):lower()
 	handle:close()
-	return theme_name
+	if theme_name:find("custom") then
+		theme_name = theme_name:match("([^%/]+)%.ya*ml.*")
+	end
+	return theme_name:gsub("[%c%s]", "")
 end
 
 -- pcall wrapper around require
@@ -20,7 +23,7 @@ function M.try_require(module_path)
 end
 
 function M.load_theme_colors(theme_name)
-	local module_name = "warped.themes." .. theme_name:lower()
+	local module_name = "warped.themes." .. theme_name
 	-- attempt to load theme colors from module if no module available
 	return M.try_require(module_name)
 end
