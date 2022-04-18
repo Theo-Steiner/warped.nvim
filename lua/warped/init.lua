@@ -55,7 +55,7 @@ function Warped.setup(config)
 	-- call once to initialize without any colors
 	local initial_theme_name = utils.extract_theme()
 	local theme_colors = utils.load_theme_colors(initial_theme_name)
-	config.onchange_callback(theme_colors, initial_theme_name, config.color_mapping)
+	config.onchange_callback(initial_theme_name, theme_colors, config.color_mapping)
 
 	-- set up listener for subsequent theme adaptation
 	utils.listen(config)
