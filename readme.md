@@ -1,9 +1,8 @@
-### warped.nvim
+# warped.nvim
 
+**warped.nvim** - keep your neovim's theme in sync with Warp (the awesome terminal).
 
 > ⚠️ Warp's API is not yet stable, so this plugin might break at any point.
-
-**warped.nvim** - keep your neovim in sync with Warp (the awesome terminal).
 
 ## Installation
 
@@ -30,15 +29,7 @@ Whenever the file-watcher detects a change to this file, it will attempt to load
 <summary>random tips and pitfalls</summary>
 <ul>
 <li>
-You can turn off background colors for nvim with this plugin, so that Warp's background-gradients and images can be seen.
-```lua
-vim.cmd([[
-    hi Normal guifg=NONE guibg=NONE
-    hi VertSplit gui=NONE guibg=NONE
-    hi LineNr guibg=NONE guifg=NONE
-    hi SignColumn guibg=NONE
-]])
-```
+You can turn off background colors for nvim with this plugin, so that Warp's background-gradients and images can be seen. (hi Normal guifg=NONE guibg=NONE hi VertSplit gui=NONE guibg=NONE hi LineNr guibg=NONE guifg=NONE hi SignColumn guibg=NONE)
 </li>
 <li>
 Lualine caches the colors it uses, so a restart of vim is necessary before the new theme applies
