@@ -25,7 +25,7 @@ function M.load_theme_colors(theme_name)
 	return M.try_require(module_name)
 end
 
-function M.listen(settings)
+function M.listen(config)
 	local fwatch = require("fwatch")
 	local path = vim.fn.expand("~/Library/Preferences/dev.warp.Warp-Stable.plist")
 	fwatch.watch(path, {
@@ -33,7 +33,7 @@ function M.listen(settings)
 			local theme_name = M.extract_theme()
 			local theme_colors = M.load_theme_colors(theme_name)
 			vim.defer_fn(function()
-				settings.onchange_callback(theme_colors, theme_name, settings.color_mapping)
+				config.onchange_callback(theme_name, theme_colors, config.color_mapping)
 			end, 100)
 		end,
 	})

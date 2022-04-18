@@ -107,7 +107,7 @@ There you can provide a table that maps the 16 ansi colors + ``bg: 'light' | 'da
 
 You also have complete control over Colorbuddy (A straightforward theming plugin by tjdevries) itself, which is exposed as ``require('warped').colorbuddy`` and in combination with the ability to provide a custom callback, I hope you can find a config that really pleases your aesthetics!
 
-> ``Warped.apply(light: boolean)`` and ``Warped.color`` are just convenient wrappers around colorbuddy's ``colorscheme()`` and ``Color`` respectively.
+> ``Warped.apply(light: boolean)`` and ``Warped.Color`` are just convenient wrappers around colorbuddy's ``colorscheme()`` and ``Color`` respectively.
 
 ### Provide a Custom Callback
 If you don't want to use colorbuddy for the colorschemes or want to do something different altogether, you can provide a custom callback that is run whenever warped.nvim detects a change to the Warp's themes.
@@ -115,7 +115,7 @@ If you don't want to use colorbuddy for the colorschemes or want to do something
 Say you would want to use external matching themes, then the below custom callback would be a way to achieve this:
 ```lua
 require('warped').setup({
-    onchange_callback = function(theme_name, theme_colors)
+    onchange_callback = function(theme_name)
         if theme_name == "dracula" then
             vim.command([[colorscheme dracula]])
         else
