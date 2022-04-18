@@ -1,6 +1,7 @@
 # warped.nvim
 
 **warped.nvim** - keep your neovim's theme in sync with Warp (the awesome terminal).
+Using colorbuddy.nvim (A straightforward theming plugin by tjdevries) and fwatch.nvim.
 
 > ⚠️ Warp's API is not yet stable, so this plugin might break at any point.
 
@@ -10,13 +11,16 @@
 -- using packer.nvim
 use {
     'Theo-Steiner/warped.nvim', 
-    require = {'tjdevries/colorbuddy.nvim', 'rktjmp/fwatch.nvim'}
+    require = {'tjdevries/colorbuddy.nvim', 'rktjmp/fwatch.nvim'},
+    config = function()
+        require('warped').setup()
+    end
 }
 ```
 
 ## Setup
 
-For an out-of-the-box experience, simply call the setup function with no additional configuration
+For an out-of-the-box experience, simply call the setup function with no additional configuration at some point after loading the plugin (e.g. in Packer's "config" hook)
 ```lua
 -- simply call
 require('warped').setup()
@@ -26,11 +30,8 @@ This will initiate a file-watcher in the background to listen for changes to you
 Whenever the file-watcher detects a change to this file, it will attempt to load the theme's colors and update the colorscheme to use those colors.
 > ⚠️ Warp does not yet provide colors for its default themes, so colors will not update when selecting those themes.
 <details>
-<summary>random tips and pitfalls</summary>
+<summary>Known issues</summary>
 <ul>
-<li>
-You can turn off background colors for nvim with this plugin, so that Warp's background-gradients and images can be seen. (hi Normal guifg=NONE guibg=NONE hi VertSplit gui=NONE guibg=NONE hi LineNr guibg=NONE guifg=NONE hi SignColumn guibg=NONE)
-</li>
 <li>
 Lualine caches the colors it uses, so a restart of vim is necessary before the new theme applies
 </li>
@@ -43,7 +44,7 @@ File watching is not perfect, and sometimes this plugin misses out on a theme ch
 
 ## Advanced
 
-This is the default configuration that is applied if you call setup without any params:
+The below code represents the default configuration that is applied if you call setup without any params:
 ```lua
 Warped = require('warped')
 Warped.setup({
@@ -57,10 +58,8 @@ Warped.setup({
             -- loops through the mapping and updates colorbuddy's theme to use the theme's colors as specified
             for vim_color, assigned_color in pairs(mapping) do
                 local derived_color = theme_colors[assigned_color]
-                Warped.colorbuddy.Color.new(vim_color, derived_color or assigned_color)
+                Warped.Color.new(vim_color, derived_color or assigned_color)
             end
-            -- applies the new colors and sets background to light for bright themes
-            Warped.apply(theme_colors["bg"] == "light")
         end
     end,
     -- Mapping can be passed a table of colorbuddy's colors as keys and Warp theme's 16 ansi colors as values.
@@ -84,24 +83,34 @@ Warped.setup({
         turquoise = "bright_magenta",
         pink = "bright_yellow"
     },
+    -- If you want to customize colorbuddy's highlight groups etc you can do this here
+    -- @params Color, colors, Group, groups, styles are described in more detail in colorbuddy.nvim's readme
+    theme_config = function(Color, colors, Group, groups, styles)
+        -- the defaults are to remove background colors so that warps background can shine through.
+        Group.new("Normal", colors.none, colors.none)
+        Group.new("VertSplit", colors.none, colors.none)
+        Group.new("LineNr", colors.none, colors.none)
+        Group.new("SignColumn", colors.none, colors.none)
+    end,
     -- TODO: provide theme colors for themes that are not in Warp's theme repository
     extend_themes = {}
 })
 ```
 
-### Provide a Custom Color Mapping
+### Provide a custom color mapping
 
 To be completely honest with you, I arrived at the current default mapping by simple trial and error for what matched my aesthetics the most, with the themes I enjoy the most (Dracula and Solarized Dark).
 Since this is obviously very subjective, I included a ``mapping`` param in the setup as an escape hatch.
 
 There you can provide a table that maps the 16 ansi colors + ``bg: 'light' | 'dark'`` + Warps ``accent`` color to [colorbuddy's](https://github.com/tjdevries/colorbuddy.nvim) colors.
 
-You also have complete control over Colorbuddy (A straightforward theming plugin by tjdevries) itself, which is exposed as ``require('warped').colorbuddy`` and in combination with the ability to provide a custom callback, I hope you can find a config that really pleases your aesthetics!
+You also have complete control over colorbuddy itself, which is exposed as ``require('warped').colorbuddy`` and in combination with the ability to provide a custom callback, I hope you can find a config that really pleases your aesthetics!
 
-> ``Warped.apply(light: boolean)`` and ``Warped.Color`` are just convenient wrappers around colorbuddy's ``colorscheme()`` and ``Color`` respectively.
+> ``Warped.Color`` is just a wrapper around colorbuddy's ``Color``.
 
-### Provide a Custom Callback
-If you don't want to use colorbuddy for the colorschemes or want to do something different altogether, you can provide a custom callback that is run whenever warped.nvim detects a change to the Warp's themes.
+### Provide a custom callback
+
+If you don't want to use colorbuddy for the colorschemes or want to do something different altogether, you can provide a custom ``onchange_callback`` during setup that is run whenever warped.nvim detects a change to the Warp's themes.
 
 Say you would want to use external matching themes, then the below custom callback would be a way to achieve this:
 ```lua
@@ -112,6 +121,23 @@ require('warped').setup({
         else
             vim.command([[colorscheme jellybeans]])
         end
+    end
+})
+```
+You should even be able to drop colorbuddy as a dependency completely if you don't use it in your callback, although beware as I did not test this yet.
+
+### Customize how the theme is applied
+
+Under the hood of warped.nvim, it is just colorbuddy.nvim running, so you really have fine grained control over what nvim looks like. 
+I for example, like my cursor line to be highlighted by bold text, with no background color whatsoever:
+```lua
+require("warped").setup({
+    theme_config = function(Color, colors, Group, groups, styles)
+        -- Since I still want the background to be transparent, I call the default_theme_config first
+        require("warped.default_theme_config")(Color, colors, Group, groups, styles)
+        -- Then I make the modifications I want
+        Group.new("CursorLine", colors.none, colors.none, styles.bold)
+        Group.new("Folded", colors.none, colors.white)
     end
 })
 ```

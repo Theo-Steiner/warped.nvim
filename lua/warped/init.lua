@@ -23,7 +23,7 @@ local default_mapping = {
 	purple = "normal_magenta",
 	violet = "bright_cyan",
 	brown = "normal_white",
-	seagree = "bright_red",
+	seagreen = "bright_red",
 	turquoise = "bright_magenta",
 	-- seems unimportant
 	pink = "bright_yellow",
@@ -31,12 +31,10 @@ local default_mapping = {
 
 -- map vim colors to 16 terminal colors
 local adapt_colorscheme = function(_, theme_colors, mapping)
-	if theme_colors then
-		for vim_color, assigned_color in pairs(mapping) do
-			local derived_color = theme_colors[assigned_color]
-			Warped.Color.new(vim_color, derived_color or assigned_color)
-		end
-		Warped.apply(theme_colors["bg"] == "light")
+	theme_colors = theme_colors or {}
+	for vim_color, assigned_color in pairs(mapping) do
+		local derived_color = theme_colors[assigned_color]
+		Warped.Color.new(vim_color, derived_color or assigned_color)
 	end
 end
 
@@ -45,11 +43,14 @@ function Warped.setup(config)
 	config = config or {}
 	config.onchange_callback = config.onchange_callback or adapt_colorscheme
 	config.color_mapping = config.color_mapping or default_mapping
+	config.theme_config = config.theme_config or require("warped.default_theme_config")
 
 	-- setup colorbuddy if available
 	if Warped.colorbuddy then
-		Warped.colorbuddy.setup()
-		Warped.Color = Warped.colorbuddy.Color
+		Warped.colorbuddy.colorscheme("warped")
+		local Color, colors, Group, groups, styles = Warped.colorbuddy.setup()
+		Warped.Color = Color
+		config.theme_config(Color, colors, Group, groups, styles)
 	end
 
 	-- call once to initialize without any colors
@@ -59,10 +60,6 @@ function Warped.setup(config)
 
 	-- set up listener for subsequent theme adaptation
 	utils.listen(config)
-end
-
-function Warped.apply(light)
-	Warped.colorbuddy.colorscheme("warped", light)
 end
 
 return Warped
