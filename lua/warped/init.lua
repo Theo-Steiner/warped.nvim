@@ -31,10 +31,11 @@ local default_mapping = {
 
 -- map vim colors to 16 terminal colors
 local adapt_colorscheme = function(_, theme_colors, mapping)
-	theme_colors = theme_colors or {}
-	for vim_color, assigned_color in pairs(mapping) do
-		local derived_color = theme_colors[assigned_color]
-		Warped.Color.new(vim_color, derived_color or assigned_color)
+	if theme_colors then
+		for vim_color, assigned_color in pairs(mapping) do
+			local derived_color = theme_colors[assigned_color]
+			Warped.Color.new(vim_color, derived_color or assigned_color)
+		end
 	end
 end
 
