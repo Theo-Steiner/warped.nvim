@@ -6,9 +6,11 @@ function M.extract_theme()
 	-- remove trailing newline and any special characters from theme name
 	local theme_name = handle:read("*a"):sub(1, -2):lower()
 	handle:close()
+	-- Custom themes are stored with a different format
 	if theme_name:find("custom") then
 		theme_name = theme_name:match("([^%/]+)%.ya*ml.*")
 	end
+	-- remove special characters from theme name
 	return theme_name:gsub("[%c%s]", "")
 end
 
@@ -24,8 +26,21 @@ end
 
 function M.load_theme_colors(theme_name)
 	local module_name = "warped.themes." .. theme_name
-	-- attempt to load theme colors from module if no module available
-	return M.try_require(module_name)
+	-- attempt to load theme colors from default themes
+	local theme_colors = M.try_require(module_name)
+	if theme_colors then
+		return theme_colors
+	end
+	-- check if theme already processed
+	local processing_utils = require("warped.processing")
+	local theme_path = processing_utils.get_cache_path() .. theme_name .. ".lua"
+	local success, loaded_colors = pcall(dofile, theme_path)
+	if success then
+		return loaded_colors
+	end
+	-- generate theme modules based on .warp/themes directory and load newly generated module
+	processing_utils.generate_theme_module()
+	return dofile(theme_path)
 end
 
 function M.listen(config)

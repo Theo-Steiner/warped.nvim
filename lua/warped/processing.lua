@@ -1,3 +1,5 @@
+M = {}
+
 local dir_lookup = function(dir)
 	local handle, err = io.popen('find "' .. dir .. '" -type f')
 	local paths = {}
@@ -60,14 +62,20 @@ local generate_output_name = function(path)
 	return theme_name .. ".lua"
 end
 
-return function(dir_path)
+function M.get_cache_path()
+	return vim.fn.stdpath("cache") .. "/warped_generated_themes/"
+end
+
+function M.generate_theme_module(dir_path)
 	dir_path = dir_path or "~/.warp/themes"
 	local theme_dir = vim.fn.expand(dir_path)
 	local theme_paths = dir_lookup(theme_dir)
 	for _, file_path in ipairs(theme_paths) do
 		local colors = parse_file(file_path)
 		local output_name = generate_output_name(file_path)
-		local file, err = io.open("./lua/warped/themes/" .. output_name, "w")
+		local cache_path = M.get_cache_path()
+		os.execute("mkdir -p " .. cache_path)
+		local file, err = io.open(cache_path .. output_name, "w")
 		if file then
 			file:write(colors)
 			file:close()
@@ -76,3 +84,5 @@ return function(dir_path)
 		end
 	end
 end
+
+return M
