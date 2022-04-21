@@ -25,7 +25,7 @@ function M.try_require(module_path)
 end
 
 function M.load_theme_colors(theme_name)
-	local module_name = "warped.themes." .. theme_name
+	local module_name = "warped.default_themes." .. theme_name
 	-- attempt to load theme colors from default themes
 	local theme_colors = M.try_require(module_name)
 	if theme_colors then
