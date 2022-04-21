@@ -66,16 +66,16 @@ function M.get_cache_path()
 	return vim.fn.stdpath("cache") .. "/warped_generated_themes/"
 end
 
-function M.generate_theme_module(dir_path)
+function M.generate_theme_module(dir_path, output_path)
 	dir_path = dir_path or "~/.warp/themes"
+	output_path = output_path or M.get_cache_path()
 	local theme_dir = vim.fn.expand(dir_path)
 	local theme_paths = dir_lookup(theme_dir)
 	for _, file_path in ipairs(theme_paths) do
 		local colors = parse_file(file_path)
 		local output_name = generate_output_name(file_path)
-		local cache_path = M.get_cache_path()
-		os.execute("mkdir -p " .. cache_path)
-		local file, err = io.open(cache_path .. output_name, "w")
+		os.execute("mkdir -p " .. output_path)
+		local file, err = io.open(output_path .. output_name, "w")
 		if file then
 			file:write(colors)
 			file:close()
