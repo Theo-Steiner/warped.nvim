@@ -48,9 +48,9 @@ function M.listen(config)
 	local path = vim.fn.expand("~/Library/Preferences/dev.warp.Warp-Stable.plist")
 	fwatch.watch(path, {
 		on_event = function()
-			local theme_name = M.extract_theme()
-			local theme_colors = M.load_theme_colors(theme_name)
 			vim.defer_fn(function()
+				local theme_name = M.extract_theme()
+				local theme_colors = M.load_theme_colors(theme_name)
 				config.onchange_callback(theme_name, theme_colors, config.color_mapping)
 			end, 100)
 		end,
