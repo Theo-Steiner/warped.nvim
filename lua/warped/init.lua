@@ -15,7 +15,7 @@ end
 
 -- set up commands
 local create_commands = function()
-	vim.cmd([[command! Warped lua print(require("warped.utils").get_theme_info())]])
+	vim.cmd([[command! Warped lua vim.api.nvim_echo({{require("warped.utils").get_theme_info()}}, false, {})]])
 	vim.cmd([[command! WarpedGenerate lua require("warped.processing").generate_theme_modules()]])
 	vim.cmd([[command! WarpedClean lua require("warped.utils").clean_cache()]])
 end

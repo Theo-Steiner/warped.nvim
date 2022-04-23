@@ -54,18 +54,19 @@ end
 -- utility function for "Warped" command
 function M.get_theme_info()
 	if M.current_theme_name == nil then
-		return "Theme could not be determined.\n"
+		return "Theme could not be determined."
 	end
 	if M.current_theme_colors == nil then
-		return string.format("Detected theme: '%s' but could not load corresponding colors \n", M.current_theme_name)
+		return string.format("Detected theme: '%s' but could not load corresponding colors.", M.current_theme_name)
 	end
-	return string.format("Currently displaying theme based on: '%s'\n", M.current_theme_name)
+	return string.format("Currently displaying theme based on: '%s'.", M.current_theme_name)
 end
 
 -- utility function for WarpedClean
 function M.clean_cache()
 	local cache_path = require("warped.processing").get_cache_path()
 	os.execute("rm -rf " .. cache_path)
+    vim.api.nvim_echo({{"Cleared cache at "}, {cache_path}}, false, {})
 end
 
 function M.listen(config)

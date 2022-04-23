@@ -95,6 +95,14 @@ function M.generate_theme_modules(dir_path, output_path, process_output_name)
 			file:close()
 		else
 			print("Could not output theme module:\n" .. output_name .. "\n Failed with error: \n" .. err)
+			return
+		end
+		if vim then
+			vim.api.nvim_echo(
+				{ { "Generated themes from " }, { dir_path }, { " output to: " }, { output_path } },
+				false,
+				{}
+			)
 		end
 	end
 end
