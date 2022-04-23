@@ -3,15 +3,15 @@ local M = {}
 function M.extract_theme()
 	-- get theme name from defaults api
 	local handle = io.popen("defaults read dev.warp.Warp-Stable Theme")
-	-- remove trailing newline and any special characters from theme name
+	-- remove trailing newline and make lower case
 	local theme_name = handle:read("*a"):sub(1, -2):lower()
 	handle:close()
 	-- Custom themes are stored with a different format
 	if theme_name:find("custom") then
 		theme_name = theme_name:match("([^%/]+)%.ya*ml.*")
 	end
-	-- remove special characters from theme name
-	return theme_name:gsub("[%c%s]", "")
+	-- remove control, space and quote characters from theme name
+	return theme_name:gsub('[%c%s"]', "")
 end
 
 -- pcall wrapper around require

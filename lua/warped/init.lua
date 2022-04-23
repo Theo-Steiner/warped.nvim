@@ -4,9 +4,10 @@ Warped.colorbuddy = utils.try_require("colorbuddy")
 
 -- map vim colors to 16 terminal colors
 local adapt_colorscheme = function(_, theme_colors, mapping)
-	if theme_colors then
-		for vim_color, assigned_color in pairs(mapping) do
-			local derived_color = theme_colors[assigned_color]
+	theme_colors = theme_colors or {}
+	for vim_color, assigned_color in pairs(mapping) do
+		local derived_color = theme_colors[assigned_color]
+		if derived_color then
 			Warped.Color.new(vim_color, derived_color or assigned_color)
 		end
 	end
