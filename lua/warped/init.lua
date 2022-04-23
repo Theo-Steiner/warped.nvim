@@ -5,7 +5,7 @@ Warped.colorbuddy = utils.try_require("colorbuddy")
 -- map vim colors to 16 terminal colors
 local adapt_colorscheme = function(theme_name, theme_colors, mapping)
 	theme_colors = theme_colors or {}
-    local active_mapping = mapping[theme_name] or mapping.default
+	local active_mapping = mapping[theme_name] or mapping.default
 	for vim_color, assigned_color in pairs(active_mapping) do
 		local derived_color = theme_colors[assigned_color]
 		if derived_color then
@@ -17,6 +17,7 @@ end
 -- set up commands
 local create_commands = function()
 	vim.cmd([[command! Warped lua vim.api.nvim_echo({{require("warped.utils").get_theme_info()}}, false, {})]])
+	vim.cmd([[command! WarpedApply lua require("warped.utils").apply_theme()]])
 	vim.cmd([[command! WarpedGenerate lua require("warped.processing").generate_theme_modules()]])
 	vim.cmd([[command! WarpedClean lua require("warped.utils").clean_cache()]])
 end
@@ -38,17 +39,11 @@ function Warped.setup(config)
 		config.theme_config(Color, colors, Group, groups, styles)
 	end
 
-	-- call once to initialize without any colors
-	local initial_theme_name = utils.extract_theme()
-	local theme_colors = utils.load_theme_colors(initial_theme_name)
-	config.onchange_callback(initial_theme_name, theme_colors, config.color_mapping)
-
-	-- Save the current theme name for theme info
-	utils.current_theme_name = initial_theme_name
-	utils.current_theme_colors = theme_colors
-
 	-- set up listener for subsequent theme adaptation
-	utils.listen(config)
+	local initial_apply = utils.listen(config)
+
+	-- call once to initialize
+	initial_apply()
 end
 
 return Warped

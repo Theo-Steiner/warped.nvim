@@ -39,6 +39,8 @@ Whenever the file-watcher detects a change to this file, it will attempt to load
 
 Call ``:Warped`` to get information about the current theme loaded by warped.nvim.
 
+``:WarpedApply`` is a way to manually trigger theme detection, if for any reason the file watcher did not register a change.
+
 Warped.nvim generates themes just in time from the theme_name.yaml files in your "~/.warp/themes" directory and caches them in your file system.
 You might want to hook into this process directly: 
 ``:WarpedClean`` - Clears the cache

@@ -72,15 +72,21 @@ end
 function M.listen(config)
 	local fwatch = require("fwatch")
 	local path = vim.fn.expand("~/Library/Preferences/dev.warp.Warp-Stable.plist")
+	M.apply_theme = function()
+		M.current_theme_name = M.extract_theme()
+		M.current_theme_colors = M.load_theme_colors(M.current_theme_name)
+		config.onchange_callback(M.current_theme_name, M.current_theme_colors, config.color_mapping)
+		vim.api.nvim_echo({ { "Applied theme: " }, { M.current_theme_name } }, false, {})
+	end
+
+	-- call apply theme deferred in listener
 	fwatch.watch(path, {
 		on_event = function()
-			vim.defer_fn(function()
-				M.current_theme_name = M.extract_theme()
-				M.current_theme_colors = M.load_theme_colors(M.current_theme_name)
-				config.onchange_callback(M.current_theme_name, M.current_theme_colors, config.color_mapping)
-			end, 100)
+			vim.fn.defer(M.apply_theme, 20)
 		end,
 	})
+
+	return M.apply_theme
 end
 
 return M
