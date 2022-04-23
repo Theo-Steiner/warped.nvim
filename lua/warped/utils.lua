@@ -66,7 +66,7 @@ end
 function M.clean_cache()
 	local cache_path = require("warped.processing").get_cache_path()
 	os.execute("rm -rf " .. cache_path)
-    vim.api.nvim_echo({{"Cleared cache at "}, {cache_path}}, false, {})
+	vim.api.nvim_echo({ { "Cleared cache at " }, { cache_path } }, false, {})
 end
 
 function M.listen(config)
