@@ -2,11 +2,14 @@
 
 **warped.nvim** - keep your neovim's theme in sync with Warp (the awesome terminal).
 Using colorbuddy.nvim (A straightforward theming plugin by tjdevries) and fwatch.nvim.
+
+
 Colors for Warp's default themes are already bundled and your custom themes are parsed (and subsequently read from cache) just-in-time.
 
-> ⚠️ Warp's API is not yet stable, so this plugin might break at any point.
 
-## Installation
+> ⚠️ Beware: Warp's API is not yet stable, so this plugin might break at any point.
+
+## Installation && basic setup
 
 ```lua
 -- using packer.nvim
@@ -19,15 +22,17 @@ use {
 }
 ```
 
-## Setup
+For an out-of-the-box experience, simply call the setup function with no additional configuration at some point after loading the plugin (e.g. in Packer's "config" hook as above)
 
-For an out-of-the-box experience, simply call the setup function with no additional configuration at some point after loading the plugin (e.g. in Packer's "config" hook)
 ```lua
 -- simply call
 require('warped').setup()
 ```
 
-This will initiate a file-watcher in the background to listen for changes to your preferences file, in which Warp exposes the currently active theme. 
+
+The ``Setup()`` will initiate a file-watcher in the background to listen for changes to your preferences file, in which Warp exposes the currently active theme. 
+
+
 Whenever the file-watcher detects a change to this file, it will attempt to load the theme's colors and update the colorscheme to use those colors.
 
 ## Commands
