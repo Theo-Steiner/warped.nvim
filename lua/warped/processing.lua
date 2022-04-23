@@ -66,10 +66,12 @@ local generate_output_name = function(path)
 	return theme_name .. ".lua"
 end
 
--- get the path to where theme.lua files should be cached
-function M.get_cache_path()
+local get_cache_path = function(path)
 	return vim.fn.stdpath("cache") .. "/warped_generated_themes/"
 end
+
+-- get the path to where theme.lua files should be cached
+M.get_cache_path = get_cache_path
 
 -- Transform all installed themes into lua files and cache them
 -- @param {string} dir_path - directory to search for theme.yaml files (default: "~/.warp/themes")
@@ -77,7 +79,7 @@ end
 -- @param {function} process_output_name - post-processing for the theme's ouput names
 function M.generate_theme_modules(dir_path, output_path, process_output_name)
 	dir_path = dir_path or "~/.warp/themes"
-	output_path = output_path or M.get_cache_path()
+	output_path = output_path or get_cache_path()
 	process_output_name = process_output_name or function(output_name)
 		return output_name
 	end

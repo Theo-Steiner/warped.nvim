@@ -1,5 +1,8 @@
 local M = {}
 
+M.current_theme_name = nil
+M.current_theme_colors = nil
+
 function M.extract_theme()
 	-- get theme name from defaults api
 	local handle = io.popen("defaults read dev.warp.Warp-Stable Theme")
@@ -48,15 +51,32 @@ function M.load_theme_colors(theme_name)
 	end
 end
 
+-- utility function for "Warped" command
+function M.get_theme_info()
+	if M.current_theme_name == nil then
+		return "Theme could not be determined.\n"
+	end
+	if M.current_theme_colors == nil then
+		return string.format("Detected theme: '%s' but could not load corresponding colors \n", M.current_theme_name)
+	end
+	return string.format("Currently displaying theme based on: '%s'\n", M.current_theme_name)
+end
+
+-- utility function for WarpedClean
+function M.clean_cache()
+	local cache_path = require("warped.processing").get_cache_path()
+	os.execute("rm -rf " .. cache_path)
+end
+
 function M.listen(config)
 	local fwatch = require("fwatch")
 	local path = vim.fn.expand("~/Library/Preferences/dev.warp.Warp-Stable.plist")
 	fwatch.watch(path, {
 		on_event = function()
 			vim.defer_fn(function()
-				local theme_name = M.extract_theme()
-				local theme_colors = M.load_theme_colors(theme_name)
-				config.onchange_callback(theme_name, theme_colors, config.color_mapping)
+				M.current_theme_name = M.extract_theme()
+				M.current_theme_colors = M.load_theme_colors(M.current_theme_name)
+				config.onchange_callback(M.current_theme_name, M.current_theme_colors, config.color_mapping)
 			end, 100)
 		end,
 	})
