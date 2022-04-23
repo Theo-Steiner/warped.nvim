@@ -90,7 +90,7 @@ function M.listen(config)
 	-- call apply theme deferred in listener
 	fwatch.watch(path, {
 		on_event = function()
-			vim.fn.defer(M.apply_theme, 20)
+			vim.defer_fn(M.apply_theme, 20)
 		end,
 	})
 
