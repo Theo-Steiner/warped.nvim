@@ -1,5 +1,6 @@
 M = {}
 
+-- get a list of all yaml files from within a directory
 local dir_lookup = function(dir)
 	local handle, err = io.popen('find "' .. dir .. '" -type f')
 	local paths = {}
@@ -16,6 +17,7 @@ local dir_lookup = function(dir)
 	return paths
 end
 
+-- process theme.yaml files into a table of colors
 local parse_file = function(file_path)
 	local colors = ""
 	local prefix = ""
@@ -46,7 +48,7 @@ local parse_file = function(file_path)
 						end
 					end
 					if colorname and colorvalue then
-						colors = string.format("%s %s%s = %s,", colors, prefix, colorname, colorvalue)
+						colors = string.format("%s \t%s%s = %s,\n", colors, prefix, colorname, colorvalue)
 					end
 				end
 			end
@@ -54,26 +56,36 @@ local parse_file = function(file_path)
 	else
 		print("Could read from file: \n" .. file_path .. "\n Failed with error: \n" .. err)
 	end
-	return "return {" .. colors .. "}"
+	return "return {\n" .. colors .. "}"
 end
 
+-- generate a theme's output name from its path (e.g. /path/to/my_theme.yaml -> my_theme.lua)
+-- default themes currently drop underscores, and therefore need special processing (see process_output_name)
 local generate_output_name = function(path)
 	local theme_name = path:match("([^%/]+)%.ya*ml$")
 	return theme_name .. ".lua"
 end
 
+-- get the path to where theme.lua files should be cached
 function M.get_cache_path()
 	return vim.fn.stdpath("cache") .. "/warped_generated_themes/"
 end
 
-function M.generate_theme_module(dir_path, output_path)
+-- Transform all installed themes into lua files and cache them
+-- @param {string} dir_path - directory to search for theme.yaml files (default: "~/.warp/themes")
+-- @param {string} output_path - directory to put theme.lua files (default: cache)
+-- @param {function} process_output_name - post-processing for the theme's ouput names
+function M.generate_theme_module(dir_path, output_path, process_output_name)
 	dir_path = dir_path or "~/.warp/themes"
 	output_path = output_path or M.get_cache_path()
+	process_output_name = process_output_name or function(output_name)
+		return output_name
+	end
 	local theme_dir = vim and vim.fn.expand(dir_path) or dir_path
 	local theme_paths = dir_lookup(theme_dir)
 	for _, file_path in ipairs(theme_paths) do
 		local colors = parse_file(file_path)
-		local output_name = generate_output_name(file_path)
+		local output_name = process_output_name(generate_output_name(file_path))
 		os.execute("mkdir -p " .. output_path)
 		local file, err = io.open(output_path .. output_name, "w")
 		if file then
