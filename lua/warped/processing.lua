@@ -75,7 +75,7 @@ end
 -- @param {string} dir_path - directory to search for theme.yaml files (default: "~/.warp/themes")
 -- @param {string} output_path - directory to put theme.lua files (default: cache)
 -- @param {function} process_output_name - post-processing for the theme's ouput names
-function M.generate_theme_module(dir_path, output_path, process_output_name)
+function M.generate_theme_modules(dir_path, output_path, process_output_name)
 	dir_path = dir_path or "~/.warp/themes"
 	output_path = output_path or M.get_cache_path()
 	process_output_name = process_output_name or function(output_name)

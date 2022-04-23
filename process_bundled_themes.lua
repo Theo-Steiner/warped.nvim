@@ -4,4 +4,4 @@ local processing_utils = dofile("./lua/warped/processing.lua")
 local process_output_name = function(output_name)
 	return output_name:gsub("_", "")
 end
-processing_utils.generate_theme_module("./themes/warp_bundled", "./lua/warped/default_themes/", process_output_name)
+processing_utils.generate_theme_modules("./themes/warp_bundled", "./lua/warped/default_themes/", process_output_name)
