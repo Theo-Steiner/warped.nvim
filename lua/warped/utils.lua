@@ -27,6 +27,14 @@ function M.try_require(module_path)
 	return nil
 end
 
+function M.shallow_copy(table)
+	local copy = {}
+	for k, v in pairs(table) do
+		copy[k] = v
+	end
+	return copy
+end
+
 function M.load_theme_colors(theme_name)
 	local module_name = "warped.default_themes." .. theme_name
 	-- attempt to load theme colors from default themes

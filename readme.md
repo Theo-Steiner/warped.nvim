@@ -128,7 +128,7 @@ There you can provide a table that maps the 16 ansi colors + ``bg: 'light' | 'da
 I for example have a custom mapping for "gruvboxdark" in my setup because I think the highlighting color is really difficult to read otherwise:
 ```lua
 local my_mapping = require("warped.default_mapping")
-my_mapping["gruvboxdark"] = my_mapping.default
+my_mapping["gruvboxdark"] = require("warped.utils").shallow_copy(my_mapping.default)
 my_mapping.gruvboxdark.blue = "bright_magenta"
 
 require("warped").setup({
