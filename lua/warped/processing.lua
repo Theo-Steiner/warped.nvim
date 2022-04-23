@@ -12,7 +12,7 @@ local dir_lookup = function(dir)
 		end
 		handle:close()
 	else
-		print("Could read from directory: \n" .. dir .. "\n Failed with error: \n" .. err)
+		print("Warped.nvim \n" .. "Could not read from directory: \n" .. dir .. "\n Failed with error: \n" .. err)
 	end
 	return paths
 end
@@ -54,7 +54,7 @@ local parse_file = function(file_path)
 			end
 		end
 	else
-		print("Could read from file: \n" .. file_path .. "\n Failed with error: \n" .. err)
+		print("Warped.nvim \n" .. "Could not read from file: \n" .. file_path .. "\n Failed with error: \n" .. err)
 	end
 	return "return {\n" .. colors .. "}"
 end
@@ -94,7 +94,13 @@ function M.generate_theme_modules(dir_path, output_path, process_output_name)
 			file:write(colors)
 			file:close()
 		else
-			print("Could not output theme module:\n" .. output_name .. "\n Failed with error: \n" .. err)
+			print(
+				"Warped.nvim \n"
+					.. "Could not output theme module:\n"
+					.. output_name
+					.. "\n Failed with error: \n"
+					.. err
+			)
 			return
 		end
 		if vim then
