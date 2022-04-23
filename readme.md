@@ -72,9 +72,9 @@ Warped.setup({
     -- @param mapping: a table that provides a mapping from theme_colors to colorbuddy's theme
     -- @see mapping
     onchange_callback = function(theme_name, theme_colors, mapping)
-        theme_colors = theme_color or {}
-        -- loops through the mapping and updates colorbuddy's theme to use the theme's colors as specified
-        for vim_color, assigned_color in pairs(mapping) do
+        theme_colors = theme_colors or {}
+        local active_mapping = mapping[theme_name] or mapping.default
+        for vim_color, assigned_color in pairs(active_mapping) do
             local derived_color = theme_colors[assigned_color]
             if derived_color then
                 Warped.Color.new(vim_color, derived_color or assigned_color)
@@ -84,23 +84,25 @@ Warped.setup({
     -- Mapping can be passed a table of colorbuddy's colors as keys and Warp theme's 16 ansi colors as values.
     -- The mapping is applied by the default onchange_callback or passed to your custom callback.
     mapping = {
-        background = "background",
-        foreground = "foreground",
-        white = "normal_white",
-        black = "normal_black",
-        red = "normal_red",
-        green = "bright_green",
-        yellow = "normal_blue",
-        blue = "normal_cyan",
-        orange = "normal_yellow",
-        aqua = "bright_blue",
-        cyan = "normal_green",
-        purple = "normal_magenta",
-        violet = "bright_cyan",
-        brown = "normal_white",
-        seagree = "bright_red",
-        turquoise = "bright_magenta",
-        pink = "bright_yellow"
+        default = {
+            background = "background",
+            foreground = "foreground",
+            white = "normal_white",
+            black = "normal_black",
+            red = "normal_red",
+            green = "bright_green",
+            yellow = "normal_blue",
+            blue = "normal_cyan",
+            orange = "normal_yellow",
+            aqua = "bright_blue",
+            cyan = "normal_green",
+            purple = "normal_magenta",
+            violet = "bright_cyan",
+            brown = "normal_white",
+            seagree = "bright_red",
+            turquoise = "bright_magenta",
+            pink = "bright_yellow"
+        }
     },
     -- If you want to customize colorbuddy's highlight groups etc you can do this here
     -- @params Color, colors, Group, groups, styles are described in more detail in colorbuddy.nvim's readme
@@ -117,14 +119,20 @@ Warped.setup({
 ### Provide a custom color mapping
 
 To be completely honest with you, I arrived at the current default mapping by simple trial and error for what matched my aesthetics the most, with the themes I enjoy the most (Dracula and Solarized Dark).
-Since this is obviously very subjective, I included a ``mapping`` param in the setup as an escape hatch.
+Since this is obviously very subjective, I included a ``mapping`` option in the setup as an escape hatch.
 
-There you can provide a table that maps the 16 ansi colors + ``bg: 'light' | 'dark'`` + Warps ``accent`` color to [colorbuddy's](https://github.com/tjdevries/colorbuddy.nvim) colors.
-(You could even base your mapping on the default mapping, which is exposed like this``local default_mapping = require("warped.default_mapping")``)
+There you can provide a table that maps the 16 ansi colors + ``bg: 'light' | 'dark'`` + Warps ``accent`` color to [colorbuddy's](https://github.com/tjdevries/colorbuddy.nvim) colors, on a *theme by theme basis* with the "default" mapping as the fallback.
 
-You also have complete control over colorbuddy itself, which is exposed as ``require('warped').colorbuddy`` and in combination with the ability to provide a custom callback, I hope you can find a config that really pleases your aesthetics!
+I for example have a custom mapping for "gruvboxdark" in my setup because I think the highlighting color is really difficult to read otherwise:
+```lua
+local my_mapping = require("warped.default_mapping")
+my_mapping["gruvboxdark"] = my_mapping.default
+my_mapping.gruvboxdark.blue = "bright_magenta"
 
-> ``Warped.Color`` is just a wrapper around colorbuddy's ``Color``.
+require("warped").setup({
+	mapping = my_mapping,
+})
+```
 
 ### Customize the base-colorbuddy theme
 
@@ -141,6 +149,11 @@ require("warped").setup({
     end
 })
 ```
+
+
+You also have complete control over colorbuddy itself, which is exposed as ``require('warped').colorbuddy`` and in combination with the ability to provide a custom callback, I hope you can find a config that really pleases your aesthetics!
+
+> ``Warped.Color`` is just a wrapper around colorbuddy's ``Color``.
 
 ### Provide a custom callback
 
