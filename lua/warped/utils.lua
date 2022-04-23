@@ -40,7 +40,12 @@ function M.load_theme_colors(theme_name)
 	end
 	-- generate theme modules based on .warp/themes directory and load newly generated module
 	processing_utils.generate_theme_module()
-	return dofile(theme_path)
+	success, loaded_colors = pcall(dofile, theme_path)
+	if success then
+		return loaded_colors
+	else
+		return nil
+	end
 end
 
 function M.listen(config)
