@@ -2,7 +2,7 @@
 
 **warped.nvim** - keep your neovim's theme in sync with [Warp (the awesome terminal)](https://www.warp.dev/).
 
-Highly customizable - you can use it out of the box with theming provided by colorbuddy.nvim (A great plugin by TJ DeVries) or literally do anything you feel like with the [advanced configuration](#advanced).
+Highly customizable: use it out of the box with theming provided by colorbuddy.nvim (A great plugin by TJ DeVries) or literally do **anything you want** with the [advanced configuration](#advanced).
 
 ![Warped.nvim in action](warped-nvim.gif)
 
