@@ -44,9 +44,14 @@ Call ``:Warped`` to get information about the current theme loaded by warped.nvi
 
 Warped.nvim generates themes just in time from the theme_name.yaml files in your "~/.warp/themes" directory and caches them in your file system.
 You might want to hook into this process directly: 
+
 ``:WarpedClean`` - Clears the cache
+
 For example you might want to clean the cache to get rid of themes you no longer have on your system...
+
+
 ``:WarpedGenerate`` - Generates and caches modules for all your themes
+
 ... or perhaps you notice that a theme went stale and you would like to regenerate it based on its .yaml file
 
 
