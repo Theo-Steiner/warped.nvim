@@ -12,20 +12,16 @@ end
 function M.initiate(file_path, on_change_callback)
 	local file_watcher = vim.loop.new_fs_event()
 	---@diagnostic disable-next-line: unused-local
-	local callback = function(err, fname, events)
+	local callback = vim.schedule_wrap(function(err, fname, events)
 		if err then
-			vim.schedule(function()
-				handle_err(err, file_watcher)
-			end)
+			handle_err(err, file_watcher)
 		else
-			vim.schedule(function()
-				on_change_callback()
-				-- For some reason the callback is not called repeatedly, unless I detach and reattach the watcher.
-				file_watcher:stop()
-				M.initiate(file_path, on_change_callback)
-			end)
+			-- For some reason the callback is not called repeatedly, unless I detach and reattach the watcher.
+			file_watcher:stop()
+			on_change_callback()
+			M.initiate(file_path, on_change_callback)
 		end
-	end
+	end)
 	-- attach file watcher
 	file_watcher:start(file_path, {}, callback)
 end
