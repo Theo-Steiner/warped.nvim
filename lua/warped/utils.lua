@@ -78,7 +78,7 @@ function M.clean_cache()
 end
 
 function M.listen(config)
-	local fwatch = require("fwatch")
+	local file_watcher = require("warped.file_watching")
 	local path = vim.fn.expand("~/Library/Preferences/dev.warp.Warp-Stable.plist")
 	M.apply_theme = function()
 		M.current_theme_name = M.extract_theme()
@@ -87,12 +87,8 @@ function M.listen(config)
 		vim.api.nvim_echo({ { "Applied theme: " }, { M.current_theme_name } }, false, {})
 	end
 
-	-- call apply theme deferred in listener
-	fwatch.watch(path, {
-		on_event = function()
-			vim.defer_fn(M.apply_theme, 20)
-		end,
-	})
+	-- initiate file_watcher with apply_theme as callback
+	file_watcher.initiate(path, M.apply_theme)
 
 	return M.apply_theme
 end

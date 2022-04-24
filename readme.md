@@ -1,7 +1,7 @@
 # warped.nvim
 
 **warped.nvim** - keep your neovim's theme in sync with Warp (the awesome terminal).
-Using colorbuddy.nvim (A straightforward theming plugin by tjdevries) and fwatch.nvim.
+Using colorbuddy.nvim (A straightforward theming plugin by tjdevries).
 
 ![Warped.nvim in action](warped-nvim.gif)
 
@@ -16,7 +16,7 @@ Colors for Warp's default themes are already bundled and your custom themes are 
 -- using packer.nvim
 use {
     'Theo-Steiner/warped.nvim', 
-    require = {'tjdevries/colorbuddy.nvim', 'rktjmp/fwatch.nvim'},
+    require = {'tjdevries/colorbuddy.nvim'},
     config = function()
         require('warped').setup()
     end
