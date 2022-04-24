@@ -3,6 +3,7 @@
 **warped.nvim** - keep your neovim's theme in sync with Warp (the awesome terminal).
 Using colorbuddy.nvim (A straightforward theming plugin by tjdevries) and fwatch.nvim.
 
+![Warped.nvim in action](warped-nvim.gif)
 
 Colors for Warp's default themes are already bundled and your custom themes are parsed (and subsequently read from cache) just-in-time.
 
