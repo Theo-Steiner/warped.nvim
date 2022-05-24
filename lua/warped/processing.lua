@@ -2,18 +2,14 @@ M = {}
 
 -- get a list of all yaml files from within a directory
 local dir_lookup = function(dir)
-	local handle, err = io.popen('find "' .. dir .. '" -type f')
+	local handle = assert(io.popen('find "' .. dir .. '" -type f'))
 	local paths = {}
-	if handle then
-		for file_path in handle:lines() do
-			if file_path:match("%.ya*ml$") then
-				table.insert(paths, file_path)
-			end
+	for file_path in handle:lines() do
+		if file_path:match("%.ya*ml$") then
+			table.insert(paths, file_path)
 		end
-		handle:close()
-	else
-		print("Warped.nvim \n" .. "Could not read from directory: \n" .. dir .. "\n Failed with error: \n" .. err)
 	end
+	handle:close()
 	return paths
 end
 
@@ -66,7 +62,7 @@ local generate_output_name = function(path)
 	return theme_name .. ".lua"
 end
 
-local get_cache_path = function(path)
+local get_cache_path = function()
 	return vim.fn.stdpath("cache") .. "/warped_generated_themes/"
 end
 
@@ -84,32 +80,36 @@ function M.generate_theme_modules(dir_path, output_path, process_output_name)
 		return output_name
 	end
 	local theme_dir = vim and vim.fn.expand(dir_path) or dir_path
-	local theme_paths = dir_lookup(theme_dir)
-	for _, file_path in ipairs(theme_paths) do
-		local colors = parse_file(file_path)
-		local output_name = process_output_name(generate_output_name(file_path))
-		os.execute("mkdir -p " .. output_path)
-		local file, err = io.open(output_path .. output_name, "w")
-		if file then
-			file:write(colors)
-			file:close()
-		else
-			print(
-				"Warped.nvim \n"
-					.. "Could not output theme module:\n"
-					.. output_name
-					.. "\n Failed with error: \n"
-					.. err
-			)
-			return
+	local success, theme_paths = pcall(dir_lookup, theme_dir)
+	if success then
+		for _, file_path in ipairs(theme_paths) do
+			local colors = parse_file(file_path)
+			local output_name = process_output_name(generate_output_name(file_path))
+			os.execute("mkdir -p " .. output_path)
+			local file, err = io.open(output_path .. output_name, "w")
+			if file then
+				file:write(colors)
+				file:close()
+			else
+				print(
+					"Warped.nvim \n"
+						.. "Could not output theme module:\n"
+						.. output_name
+						.. "\n Failed with error: \n"
+						.. err
+				)
+				return
+			end
+			if vim then
+				vim.api.nvim_echo(
+					{ { "Generated themes from " }, { dir_path }, { " output to: " }, { output_path } },
+					false,
+					{}
+				)
+			end
 		end
-		if vim then
-			vim.api.nvim_echo(
-				{ { "Generated themes from " }, { dir_path }, { " output to: " }, { output_path } },
-				false,
-				{}
-			)
-		end
+	else
+		error("Could not access theme directory: " .. theme_dir)
 	end
 end
 
