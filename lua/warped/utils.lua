@@ -7,14 +7,25 @@ function M.extract_theme()
 	-- get theme name from defaults api
 	local handle = io.popen("defaults read dev.warp.Warp-Stable Theme")
 	-- remove trailing newline and make lower case
-	local theme_name = handle:read("*a"):sub(1, -2):lower()
-	handle:close()
+	local theme_name
+	if handle then
+		theme_name = handle:read("*a"):sub(1, -2):lower()
+		handle:close()
+	else
+		error("Warped.nvim could not access warp's defaults file")
+	end
 	-- Custom themes are stored with a different format
 	if theme_name:find("custom") then
 		theme_name = theme_name:match("([^%/]+)%.ya*ml.*")
 	end
 	-- remove control, space and quote characters from theme name
-	return theme_name:gsub('[%c%s"]', "")
+	theme_name = theme_name:gsub('[%c%s"]', "")
+	-- handle special default theme names
+	if theme_name == "dark" or theme_name == "light" then
+		return "warp" .. theme_name
+	else
+		return theme_name
+	end
 end
 
 -- pcall wrapper around require
@@ -88,7 +99,15 @@ function M.listen(config)
 		M.current_theme_name = M.extract_theme()
 		M.current_theme_colors = M.load_theme_colors(M.current_theme_name)
 		config.onchange_callback(M.current_theme_name, M.current_theme_colors, config.color_mapping)
-		vim.api.nvim_echo({ { "Applied theme: " }, { M.current_theme_name } }, false, {})
+		if M.current_theme_colors then
+			vim.api.nvim_echo({ { "Applied theme: " }, { M.current_theme_name } }, false, {})
+		else
+			vim.api.nvim_echo(
+				{ { "Could not load corresponding colors for theme " }, { M.current_theme_name } },
+				false,
+				{}
+			)
+		end
 	end
 
 	-- initiate file_watcher with apply_theme as callback
